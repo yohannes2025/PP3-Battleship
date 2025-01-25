@@ -1,5 +1,3 @@
-# Ultimate Battleships Game
-
 from random import randint
 
 # Global variable to keep track of scores
@@ -83,58 +81,40 @@ def populate_board(board):
 
 def populate_board_player(board):
     """Allow the player to manually place ships on the board."""
-
     print(f"{board.name}, it's time to place your ships!")
     while len(board.ships) < board.num_ships:
-        try:
-            x, y = map(
-                int,
-                input(
+        while True:
+            try:
+                x, y = map(int, input(
                     f"Enter coordinates for ship {len(board.ships) + 1} "
                     "as 'row column' (e.g., 1 2): "
-                ).split()
-            )
+                ).split())
 
-            if valid_coordinates(x, y, board):
-                board.add_ship(x, y)
-                print(f"Ship placed at ({x}, {y}).")
-                board.display()
-            else:
-                print(
-                    "Invalid coordinates or location already occupied. "
-                    "Try again."
-                )
+                if valid_coordinates(x, y, board):
+                    board.add_ship(x, y)
+                    print(f"Ship placed at ({x}, {y}).")
+                    board.display()
+                    break
+                else:
+                    print(
+                        "Invalid coordinates or location already occupied. Try again.")
 
-        except ValueError:
-            print(
-                "Invalid input. Please enter two numbers "
-                "separated by a space."
-            )
+            except ValueError:
+                print("Invalid input. Please enter two numbers separated by a space.")
 
 
 def get_player_guess(board):
     """Get player's guess input."""
     while True:
         try:
-            x, y = map(
-                int,
-                input("Enter your guess as 'row column' (e.g., 1 2): ").split()
-            )
-
+            x, y = map(int, input(
+                "Enter your guess as 'row column' (e.g., 1 2): ").split())
             if 0 <= x < board.board_size and 0 <= y < board.board_size:
                 return x, y
-
-            # Specific comment for out-of-range input
-            print(
-                f"Invalid input. Please enter a number between {0} and "
-                f"{board.board_size - 1} for both row and column."
-            )
-
+            print(f"Invalid input. Please enter a number between 0 and {
+                  board.board_size - 1} for both row and column.")
         except ValueError:
-            print(
-                "Invalid input. Please enter two numbers "
-                "separated by a space."
-            )
+            print("Invalid input. Please enter two numbers separated by a space.")
 
 
 def get_computer_guess(board):
@@ -169,8 +149,7 @@ def play_game(computer_board, player_board):
         while True:
             player_x, player_y = get_player_guess(computer_board)
             player_result = take_turn(
-                computer_board,
-                lambda b: (player_x, player_y))
+                computer_board, lambda b: (player_x, player_y))
 
             # Allow the game to proceed if the guess is valid
             if player_result != "Repeat":
@@ -182,80 +161,87 @@ def play_game(computer_board, player_board):
             scores["player"] += 1  # Increment player score for a hit
 
         # Computer's turn
-            computer_x, computer_y = get_computer_guess(player_board)
-            computer_result = take_turn(
-                player_board,
-                lambda b: (computer_x, computer_y)
-            )
+        computer_x, computer_y = get_computer_guess(player_board)
+        computer_result = take_turn(
+            player_board, lambda b: (computer_x, computer_y))
 
         if computer_result == "Hit":
             player_board.ships.remove((computer_x, computer_y))
             scores["computer"] += 1  # Increment computer score for a hit
 
         # Round Summary
-            print("\nSummary:")
-            print(
-                f"Player guessed: ({player_x}, {player_y}) - {player_result}"
-            )
-            print(
-                f"Computer guessed: ({computer_x}, {computer_y}) - "
-                f"{computer_result}"
-            )
+        print("\nSummary:")
+        print(f"Player guessed: ({player_x}, {player_y}) - {player_result}")
+        print(f"Computer guessed: ({computer_x}, {
+              computer_y}) - {computer_result}")
 
         print("_" * 35)
 
         # Scores after each round
         print(f"After round {round_num}, the scores are:")
-        print(
-            f"{player_board.name}: {scores['player']} \t"
-            f"Computer: {scores['computer']}"
-        )
+        print(f"{player_board.name}: {scores['player']} \t"
+              f"Computer: {scores['computer']}")
         print("_" * 35)
 
         # Check for end of game
         if not computer_board.ships:
             print("You sank all the computer's ships! You win!")
-            scores["player"]
             break
 
         if not player_board.ships:
             print("The computer sank all your ships! You lose!")
-            scores["computer"]
             break
 
         # Prompt to continue or quit
         choice = input(
-            "Enter any key to continue or 'n' to quit: "
-        ).strip().lower()
-
+            "Enter any key to continue or 'n' to quit: ").strip().lower()
         if choice == 'n':
             print("You chose to quit the game. Thank you for playing!")
             return  # Exit the function, ending the game
 
     # Final scores
     print("\nFinal Scores:")
-    print(
-        f"{player_board.name}: {scores['player']}, "
-        f"Computer: {scores['computer']}"
-    )
+    print(f"{player_board.name}: {scores['player']}, "
+          f"Computer: {scores['computer']}")
+
+
+def get_valid_input(prompt, min_value, max_value):
+    """Get a valid integer input from the user within a specified range."""
+    while True:
+        user_input = input(prompt).strip()
+        if not user_input:  # Check for empty input
+            print("Input cannot be empty. Please try again.")
+            continue
+
+        try:
+            value = int(user_input)
+            if min_value <= value <= max_value:
+                return value
+            else:
+                print(f"Input must be between {min_value} and {
+                      max_value}. Please try again.")
+        except ValueError:
+            print("Invalid input. Please enter an integer.")
 
 
 def new_game():
     """Initialize and start a new game."""
-    board_size = int(input("Enter board size: "))
-    # User-defined ship count
-    num_ships = int(input("Enter the number of ships: "))
+    board_size = get_valid_input("Enter board size (5-10): ", 5, 10)
+    num_ships = get_valid_input(
+        "Enter the number of ships (1 to board size - 1): ", 1, board_size - 1)
+
     # Reset scores for a new game
     scores["computer"] = 0
     scores["player"] = 0
+
     print("_" * 35)
     print()
     print("Welcome to ULTIMATE BATTLESHIPS!!")
     print(f"Board Size: {board_size}. Number of ships: {num_ships}")
     print("Top left corner is row: 0, col: 0")
     print("_" * 35)
-    player_name = input("Please enter your name: ")
-    print("_" * 35)
+
+    player_name = input("Please enter your name: ").strip()
     computer_board = Board(board_size, num_ships, "Computer", "computer")
     player_board = Board(board_size, num_ships, player_name, "player")
 
