@@ -111,8 +111,7 @@ def get_player_guess(board):
                 "Enter your guess as 'row column' (e.g., 1 2): ").split())
             if 0 <= x < board.board_size and 0 <= y < board.board_size:
                 return x, y
-            print(f"Invalid input. Please enter a number between 0 and {
-                  board.board_size - 1} for both row and column.")
+            print(f"Invalid input. Please enter a number between 0 and {board.board_size - 1} for both row and column.")
         except ValueError:
             print("Invalid input. Please enter two numbers separated by a space.")
 
@@ -133,7 +132,6 @@ def take_turn(board, guess_func):
 
 def play_game(computer_board, player_board):
     """Alternate turns between player and computer until the game ends."""
-
     round_num = 0  # Track round number
 
     while player_board.ships and computer_board.ships:
@@ -172,8 +170,7 @@ def play_game(computer_board, player_board):
         # Round Summary
         print("\nSummary:")
         print(f"Player guessed: ({player_x}, {player_y}) - {player_result}")
-        print(f"Computer guessed: ({computer_x}, {
-              computer_y}) - {computer_result}")
+        print(f"Computer guessed: ({computer_x}, {computer_y}) - {computer_result}")
 
         print("_" * 35)
 
@@ -218,10 +215,18 @@ def get_valid_input(prompt, min_value, max_value):
             if min_value <= value <= max_value:
                 return value
             else:
-                print(f"Input must be between {min_value} and {
-                      max_value}. Please try again.")
+                print(f"Input must be between {min_value} and {max_value}. Please try again.")
         except ValueError:
             print("Invalid input. Please enter an integer.")
+
+
+def is_valid_name(name):
+    """Check if the player's name meets the criteria."""
+    if not name.isalpha():
+        return False
+    if len(name) < 1 or len(name) >= 15:
+        return False
+    return True
 
 
 def new_game():
@@ -241,7 +246,14 @@ def new_game():
     print("Top left corner is row: 0, col: 0")
     print("_" * 35)
 
-    player_name = input("Please enter your name: ").strip()
+    # Validate player name
+    while True:
+        player_name = input("Please enter your name: ").strip()
+        if is_valid_name(player_name):
+            break
+        print("Invalid name! Name must start with an alphabet, have no special characters, "
+              "and be between 1 and 14 characters long. Please try again.")
+
     computer_board = Board(board_size, num_ships, "Computer", "computer")
     player_board = Board(board_size, num_ships, player_name, "player")
 
